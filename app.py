@@ -46,7 +46,7 @@ if user_input:
     # Transform input and predict
     X = vectorizer.transform([user_input])
     pred = model.predict(X)
-    pred_label = num_to_label[int(pred[0])]
+    st.write(pred)
 
     with st.chat_message("assistant"):
         st.write(f"Predicted emotion: **{pred_label}**")
