@@ -22,16 +22,6 @@ if selected_tab == 'Multi Emotion AI':
     with open('SVMVector.pkl', 'rb') as file:
         svm_vectorizer = pickle.load(file)
 
-    # Initialize training data (using pickle files or empty data if it's the first time)
-    try:
-        with open('x_train.pkl', 'rb') as f:
-            x_train = pickle.load(f)
-        with open('y_train.pkl', 'rb') as f:
-            y_train = pickle.load(f)
-    except FileNotFoundError:
-        x_train = None  # This should be defined earlier in your script
-        y_train = pd.Series()
-
     # Display UI components
     st.title("💬 Multi Emotion Analyzer AI")
     st.link_button("💻 Pay $3 on Venmo 🤖😊", "https://venmo.com/SakritUser123?txn=pay&amount=3")
@@ -63,7 +53,6 @@ if selected_tab == 'Multi Emotion AI':
             # Predict with the existing model
             pred = svm_loaded_model.predict(X)
             explain = '0 is for sadness, 1 is for joy, 2 is for love, 3 is for anger, 4 is for fear, 5 is for surprise'
-            
 
             label_to_text = {0: 'sadness', 1: 'joy', 2: 'love', 3: 'anger', 4: 'fear', 5: 'surprise'}
 
@@ -71,20 +60,21 @@ if selected_tab == 'Multi Emotion AI':
             with st.chat_message("assistant"):
                 st.markdown(explain)
                 st.markdown(f"Prediction: {pred[0]}")
-                st.markdown('The emotion you are feeling is: ' + label_to_text[pred[0]])
-                
+                st.markdown(f'The emotion you are feeling is: {label_to_text[pred[0]]}')
 
             # Ask for correct label from the user (using st.text_input)
             correct_label = st.text_input("Enter the correct label (e.g., joy, sadness, etc.):")
 
-            
-                
+            if correct_label:
+                # Update the model with the new data (partial_fit)
+                X_new = svm_vectorizer.transform([user_input])
+                svm_loaded_model.partial_fit(X_new, [correct_label])  # No `classes` needed now
 
-                # Retrain the model with the updated data
-            svm_loaded_model.partial_fit(x_train, y_train, classes=np.unique(y_train))  # Using partial_fit for online learning
+                # Save the updated model and vectorizer
+                with open('SVMLogReg.pkl', 'wb') as f:
+                    pickle.dump(svm_loaded_model, f)
+                with open('SVMVector.pkl', 'wb') as f:
+                    pickle.dump(svm_vectorizer, f)
 
-                # Save the updated model, vectorizer, and training data
-                
-
-            st.session_state.larger_messages.append({"role": "assistant", "content": f"Model updated with label: {correct_label}"})
-            st.write("Model updated with new data!")
+                st.session_state.larger_messages.append({"role": "assistant", "content": f"Model updated with label: {correct_label}"})
+                st.write("Model updated with new data!")
