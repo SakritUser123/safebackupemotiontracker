@@ -15,14 +15,13 @@ if "smaller_messages" not in st.session_state:
 if "larger_messages" not in st.session_state:
     st.session_state.larger_messages = []
 
-
 if selected_tab == 'Multi Emotion AI':
     # Load model and vectorizer
     with open('OnlineLogReg.pkl', 'rb') as f:
         multi_loaded_model = pickle.load(f)
     with open('OnlineVector.pkl', 'rb') as file:
         multi_vectorizer = pickle.load(file)
-    
+
     # Initialize training data (using pickle files or empty data if it's the first time)
     try:
         with open('x_train.pkl', 'rb') as f:
@@ -32,7 +31,7 @@ if selected_tab == 'Multi Emotion AI':
     except FileNotFoundError:
         x_train = None  # This should be defined earlier in your script
         y_train = pd.Series()
-    
+
     # Display UI components
     st.title("💬 Multi Emotion Analyzer AI")
     st.link_button("💻 Pay $3 on Venmo 🤖😊", "https://venmo.com/SakritUser123?txn=pay&amount=3")
@@ -42,12 +41,12 @@ if selected_tab == 'Multi Emotion AI':
     Contact: [veerendrasakthi.prabhurajan@gmail.com]  
     GitHub: [The repository for this website!](https://github.com/SakritUser123/emotiontrackerai)
     """)
-    
+
     # Display previous chat messages for Larger Emotion
     for msg in st.session_state.get('larger_messages', []):
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
-    
+
     user_input = st.chat_input("Enter your text here...")
 
     if user_input:
@@ -63,9 +62,9 @@ if selected_tab == 'Multi Emotion AI':
 
             # Predict with the existing model
             pred = multi_loaded_model.predict(X)
-            explain = '0 is for sadness , 1 is for joy, 2 is for love , 3 is for anger , 4 is for fear, 5 is for surprise'
+            explain = '0 is for sadness, 1 is for joy, 2 is for love, 3 is for anger, 4 is for fear, 5 is for surprise'
             probabilities = multi_loaded_model.predict_proba(X)[0]
-            
+
             label_to_text = {0: 'sadness', 1: 'joy', 2: 'love', 3: 'anger', 4: 'fear', 5: 'surprise'}
 
             # Show prediction results to the user
@@ -77,9 +76,10 @@ if selected_tab == 'Multi Emotion AI':
                     percent = round(probabilities[i] * 100, 2)
                     st.markdown(f"- **{emotion.capitalize()}**: {percent}%")
 
-            # Ask for correct label from the user using the same input box
-            corr = st.chat_input("Enter the correct label:")
-            if corr:
+            # Ask for correct label from the user (using st.text_input)
+            correct_label = st.text_input("Enter the correct label (e.g., joy, sadness, etc.):")
+
+            if correct_label:
                 # Append the new data to the training set
                 X_new = multi_vectorizer.transform([user_input])
                 if x_train is not None:
@@ -87,7 +87,7 @@ if selected_tab == 'Multi Emotion AI':
                 else:
                     x_train = X_new  # First entry
 
-                y_train = pd.concat([y_train, pd.Series([corr])], ignore_index=True)
+                y_train = pd.concat([y_train, pd.Series([correct_label])], ignore_index=True)
 
                 # Retrain the model with the updated data
                 multi_loaded_model.fit(x_train, y_train)
@@ -102,5 +102,5 @@ if selected_tab == 'Multi Emotion AI':
                 with open('y_train.pkl', 'wb') as f:
                     pickle.dump(y_train, f)
 
-                st.session_state.larger_messages.append({"role": "assistant", "content": f"Model updated with label: {corr}"})
+                st.session_state.larger_messages.append({"role": "assistant", "content": f"Model updated with label: {correct_label}"})
                 st.write("Model updated with new data!")
