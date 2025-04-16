@@ -12,9 +12,9 @@ all_labels = list(label_to_num.values())
 if "larger_messages" not in st.session_state:
     st.session_state.larger_messages = []
 
-# Load model and vectorizer
-model_path = "SVMLogReg.pkl"
-vectorizer_path = "SVMVector.pkl"
+# Updated file paths with " (3).pkl"
+model_path = "SVMLogReg (3).pkl"
+vectorizer_path = "SVMVector (3).pkl"
 
 if os.path.exists(model_path) and os.path.exists(vectorizer_path):
     with open(model_path, "rb") as f:
