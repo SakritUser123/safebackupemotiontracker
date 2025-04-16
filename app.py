@@ -8,10 +8,10 @@ num_to_label = {v: k for k, v in label_to_num.items()}
 
 # Load model & vectorizer into session state
 if "model" not in st.session_state:
-    if os.path.exists("SVMLogReg.pkl") and os.path.exists("SVMVector.pkl"):
-        with open("SVMLogReg.pkl", "rb") as f:
+    if os.path.exists("SVMLogReg (3).pkl") and os.path.exists("SVMVector (3).pkl"):
+        with open("SVMLogReg (3).pkl", "rb") as f:
             st.session_state.model = pickle.load(f)
-        with open("SVMVector.pkl", "rb") as f:
+        with open("SVMVector (3).pkl", "rb") as f:
             st.session_state.vectorizer = pickle.load(f)
     else:
         st.error("Model or vectorizer file not found.")
@@ -35,7 +35,7 @@ if user_input:
         if correct_label in label_to_num:
             y = label_to_num[correct_label]
             model.partial_fit(X, [y])  # Safe now — it knows all classes
-            with open("SVMLogReg.pkl", "wb") as f:
+            with open("SVMLogReg (3).pkl", "wb") as f:
                 pickle.dump(model, f)
             st.success(f"Model updated with label: {correct_label}")
         else:
