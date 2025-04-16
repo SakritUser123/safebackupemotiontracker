@@ -7,7 +7,7 @@ model_path = "SVMLogReg (3).pkl"
 vectorizer_path = "SVMVector (3).pkl"
 
 # Define emotion label mappings
-label_to_num = {'sad': 0, 'joy': 1, 'love': 2, 'anger': 3, 'fear': 4, 'surprise': 5}
+label_to_num = {'sadness': 0, 'joy': 1, 'love': 2, 'anger': 3, 'fear': 4, 'surprise': 5}
 num_to_label = {v: k for k, v in label_to_num.items()}
 all_labels = list(label_to_num.values())
 
