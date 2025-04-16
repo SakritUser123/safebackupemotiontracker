@@ -22,9 +22,9 @@ label_to_text = {0: 'sadness', 1: 'joy', 2: 'love', 3: 'anger', 4: 'fear', 5: 's
 if selected_tab == 'Multi Emotion AI':
     # Load model and vectorizer (SVM model)
     try:
-        with open('SVMLogReg.pkl', 'rb') as f:
+        with open('SVMLogReg (3).pkl', 'rb') as f:
             svm_loaded_model = pickle.load(f)
-        with open('SVMVector.pkl', 'rb') as file:
+        with open('SVMVector (3).pkl', 'rb') as file:
             svm_vectorizer = pickle.load(file)
     except Exception as e:
         st.error(f"Error loading model or vectorizer: {e}")
@@ -81,9 +81,9 @@ if selected_tab == 'Multi Emotion AI':
                     svm_loaded_model.partial_fit(X_new, [correct_label_num])
 
                     # Save model and vectorizer after update
-                    with open("SVMLogReg.pkl", "wb") as f:
+                    with open("SVMLogReg (3).pkl", "wb") as f:
                         pickle.dump(svm_loaded_model, f)
-                    with open("SVMVector.pkl", "wb") as f:
+                    with open("SVMVector (3).pkl", "wb") as f:
                         pickle.dump(svm_vectorizer, f)
 
                     st.success(f"✅ Model updated and saved with label: {correct_label}")
