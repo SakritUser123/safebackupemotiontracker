@@ -46,10 +46,10 @@ if user_input:
     # Transform input and predict
     X = vectorizer.transform([user_input])
     pred = model.predict(X)
-    st.write(pred)
+    
 
     with st.chat_message("assistant"):
-        st.write(f"Predicted emotion: **{pred_label}**")
+        st.write(pred)
 
     # Ask for true label
     correct_label = st.text_input("Enter the correct label (to help me learn):", key=user_input)
