@@ -4,12 +4,17 @@ from sklearn.linear_model import SGDClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 # Initialize model and vectorizer from pickle
-
-with open('SVMLogReg (3).pkl ', 'rb') as f:
-    model = pickle.load(f)
-with open('SVMVector (3).pkl', 'rb') as f:
-    vectorizer = pickle.load(f)
-first_time = False
+try:
+    with open('SVMLogReg (3).pkl', 'rb') as f:
+        model = pickle.load(f)
+    with open('SVMVector (3).pkl', 'rb') as f:
+        vectorizer = pickle.load(f)
+    first_time = False
+except:
+    # Initialize if not found
+    model = SGDClassifier(loss='log')
+    vectorizer = TfidfVectorizer()
+    first_time = True
 
 # Streamlit UI components
 st.title("Emotion Prediction and Model Update")
@@ -21,6 +26,7 @@ if 'user_input' not in st.session_state:
 # Input for text (enter sentence to predict)
 user_input = st.text_input("Enter a sentence to predict emotion (or 'stop' to quit):", value=st.session_state.user_input)
 
+# Check if the user wants to stop
 if user_input.lower() == 'stop':
     st.write("Exiting the loop.")
 else:
