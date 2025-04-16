@@ -72,26 +72,16 @@ if selected_tab == 'Multi Emotion AI':
                 st.markdown(explain)
                 st.markdown(f"Prediction: {pred[0]}")
                 st.markdown('The emotion you are feeling is: ' + label_to_text[pred[0]])
-                for i in range(len(probabilities)):
-                    emotion = label_to_text[i]
-                    percent = round(probabilities[i] * 100, 2)
-                    st.markdown(f"- **{emotion.capitalize()}**: {percent}%")
+                
 
             # Ask for correct label from the user (using st.text_input)
             correct_label = st.text_input("Enter the correct label (e.g., joy, sadness, etc.):")
 
-            if correct_label:
-                # Append the new data to the training set
-                X_new = svm_vectorizer.transform([user_input])
-                if x_train is not None:
-                    x_train = vstack([x_train, X_new])  # Keep x_train sparse
-                else:
-                    x_train = X_new  # First entry
-
-                y_train = pd.concat([y_train, pd.Series([correct_label])], ignore_index=True)
+            
+                
 
                 # Retrain the model with the updated data
-                svm_loaded_model.partial_fit(x_train, y_train, classes=np.unique(y_train))  # Using partial_fit for online learning
+            svm_loaded_model.partial_fit(x_train, y_train, classes=np.unique(y_train))  # Using partial_fit for online learning
 
                 # Save the updated model, vectorizer, and training data
                 with open('SVMLogReg.pkl', 'wb') as f:
