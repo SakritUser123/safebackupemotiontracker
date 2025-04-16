@@ -62,10 +62,7 @@ if selected_tab == 'Multi Emotion AI':
             # Show prediction results to the user
             with st.chat_message("assistant"):
                 st.markdown(explain)
-                st.markdown("Prediction: ")
-                st.markdown('The emotion you are feeling is: ')
-                st.markdown(pred)
-                
+                st.markdown(f"Prediction: {label_to_text[pred[0]]}")
 
             # Ask for correct label from the user (using st.text_input)
             correct_label = st.text_input("Enter the correct label (e.g., joy, sadness, etc.):")
@@ -78,6 +75,12 @@ if selected_tab == 'Multi Emotion AI':
                     # Update the model with the new data (partial_fit)
                     X_new = svm_vectorizer.transform([user_input])
                     svm_loaded_model.partial_fit(X_new, [correct_label_num])  # Use numerical label
+
+                    # Save the updated model and vectorizer
+                    with open('SVMLogReg.pkl', 'wb') as f:
+                        pickle.dump(svm_loaded_model, f)
+                    with open('SVMVector.pkl', 'wb') as f:
+                        pickle.dump(svm_vectorizer, f)
 
                     st.session_state.larger_messages.append({"role": "assistant", "content": f"Model updated with label: {correct_label}"})
                     st.write("Model updated with new data!")
