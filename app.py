@@ -78,9 +78,9 @@ if selected_tab == 'Multi Emotion AI':
                     svm_loaded_model.partial_fit(X_new, [correct_label_num])  # Use numerical label
 
                     # Save the updated model and vectorizer
-                    with open('SVMLogReg.pkl', 'wb') as f:
+                    with open('SVMLogRegNew.pkl', 'wb') as f:
                         pickle.dump(svm_loaded_model, f)
-                    with open('SVMVector.pkl', 'wb') as f:
+                    with open('SVMVectorNew.pkl', 'wb') as f:
                         pickle.dump(svm_vectorizer, f)
 
                     st.session_state.larger_messages.append({"role": "assistant", "content": f"Model updated with label: {correct_label}"})
