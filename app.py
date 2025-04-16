@@ -63,7 +63,7 @@ if selected_tab == 'Multi Emotion AI':
             # Predict with the existing model
             pred = svm_loaded_model.predict(X)
             explain = '0 is for sadness, 1 is for joy, 2 is for love, 3 is for anger, 4 is for fear, 5 is for surprise'
-            probabilities = svm_loaded_model.predict_proba(X)[0]
+            
 
             label_to_text = {0: 'sadness', 1: 'joy', 2: 'love', 3: 'anger', 4: 'fear', 5: 'surprise'}
 
