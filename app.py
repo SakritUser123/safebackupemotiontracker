@@ -16,11 +16,11 @@ if "larger_messages" not in st.session_state:
     st.session_state.larger_messages = []
 
 if selected_tab == 'Multi Emotion AI':
-    # Load model and vectorizer
-    with open('OnlineLogReg.pkl', 'rb') as f:
-        multi_loaded_model = pickle.load(f)
-    with open('OnlineVector.pkl', 'rb') as file:
-        multi_vectorizer = pickle.load(file)
+    # Load model and vectorizer (SVM model)
+    with open('SVMLogReg.pkl', 'rb') as f:
+        svm_loaded_model = pickle.load(f)
+    with open('SVMVector.pkl', 'rb') as file:
+        svm_vectorizer = pickle.load(file)
 
     # Initialize training data (using pickle files or empty data if it's the first time)
     try:
@@ -58,12 +58,12 @@ if selected_tab == 'Multi Emotion AI':
         if user_input.strip():
             # Transform user input
             user_input_list = [user_input]
-            X = multi_vectorizer.transform(user_input_list)
+            X = svm_vectorizer.transform(user_input_list)
 
             # Predict with the existing model
-            pred = multi_loaded_model.predict(X)
+            pred = svm_loaded_model.predict(X)
             explain = '0 is for sadness, 1 is for joy, 2 is for love, 3 is for anger, 4 is for fear, 5 is for surprise'
-            probabilities = multi_loaded_model.predict_proba(X)[0]
+            probabilities = svm_loaded_model.predict_proba(X)[0]
 
             label_to_text = {0: 'sadness', 1: 'joy', 2: 'love', 3: 'anger', 4: 'fear', 5: 'surprise'}
 
@@ -71,7 +71,7 @@ if selected_tab == 'Multi Emotion AI':
             with st.chat_message("assistant"):
                 st.markdown(explain)
                 st.markdown(f"Prediction: {pred[0]}")
-                st.markdown('The emotion You are feeling is:' + pred[0])
+                st.markdown('The emotion you are feeling is: ' + label_to_text[pred[0]])
                 for i in range(len(probabilities)):
                     emotion = label_to_text[i]
                     percent = round(probabilities[i] * 100, 2)
@@ -82,7 +82,7 @@ if selected_tab == 'Multi Emotion AI':
 
             if correct_label:
                 # Append the new data to the training set
-                X_new = multi_vectorizer.transform([user_input])
+                X_new = svm_vectorizer.transform([user_input])
                 if x_train is not None:
                     x_train = vstack([x_train, X_new])  # Keep x_train sparse
                 else:
@@ -91,13 +91,13 @@ if selected_tab == 'Multi Emotion AI':
                 y_train = pd.concat([y_train, pd.Series([correct_label])], ignore_index=True)
 
                 # Retrain the model with the updated data
-                multi_loaded_model.fit(x_train, y_train)
+                svm_loaded_model.partial_fit(x_train, y_train, classes=np.unique(y_train))  # Using partial_fit for online learning
 
                 # Save the updated model, vectorizer, and training data
-                with open('OnlineLogReg.pkl', 'wb') as f:
-                    pickle.dump(multi_loaded_model, f)
-                with open('OnlineVector.pkl', 'wb') as file:
-                    pickle.dump(multi_vectorizer, file)
+                with open('SVMLogReg.pkl', 'wb') as f:
+                    pickle.dump(svm_loaded_model, f)
+                with open('SVMVector.pkl', 'wb') as file:
+                    pickle.dump(svm_vectorizer, file)
                 with open('x_train.pkl', 'wb') as f:
                     pickle.dump(x_train, f)
                 with open('y_train.pkl', 'wb') as f:
