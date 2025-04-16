@@ -27,7 +27,7 @@ user_input = st.text_input("Enter your text:")
 if user_input:
     X = vectorizer.transform([user_input])
     pred = model.predict(X)[0]
-    st.write("Predicted emotion: )
+    st.write("Predicted emotion:" )
     st.write(pred)
 
     correct_label = st.text_input("Correct label (optional):", "")
