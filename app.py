@@ -54,4 +54,5 @@ if selected_tab == 'Multi Emotion AI':
         with st.chat_message("user"):
             st.markdown(user_input)
 
-        st.session_state.larger_messages.append({"
+        st.session_state.larger_messages.append({"role": "assistant", "content": f"Model updated with label: {corr}"})
+        st.write("Model updated with new data!")
