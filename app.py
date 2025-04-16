@@ -84,14 +84,7 @@ if selected_tab == 'Multi Emotion AI':
             svm_loaded_model.partial_fit(x_train, y_train, classes=np.unique(y_train))  # Using partial_fit for online learning
 
                 # Save the updated model, vectorizer, and training data
-                with open('SVMLogReg.pkl', 'wb') as f:
-                    pickle.dump(svm_loaded_model, f)
-                with open('SVMVector.pkl', 'wb') as file:
-                    pickle.dump(svm_vectorizer, file)
-                with open('x_train.pkl', 'wb') as f:
-                    pickle.dump(x_train, f)
-                with open('y_train.pkl', 'wb') as f:
-                    pickle.dump(y_train, f)
+                
 
-                st.session_state.larger_messages.append({"role": "assistant", "content": f"Model updated with label: {correct_label}"})
-                st.write("Model updated with new data!")
+            st.session_state.larger_messages.append({"role": "assistant", "content": f"Model updated with label: {correct_label}"})
+            st.write("Model updated with new data!")
