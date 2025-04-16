@@ -15,6 +15,9 @@ if "smaller_messages" not in st.session_state:
 if "larger_messages" not in st.session_state:
     st.session_state.larger_messages = []
 
+# Emotion label to numerical conversion
+label_to_num = {'sadness': 0, 'joy': 1, 'love': 2, 'anger': 3, 'fear': 4, 'surprise': 5}
+
 if selected_tab == 'Multi Emotion AI':
     # Load model and vectorizer (SVM model)
     with open('SVMLogReg.pkl', 'rb') as f:
@@ -52,23 +55,29 @@ if selected_tab == 'Multi Emotion AI':
 
             # Predict with the existing model
             pred = svm_loaded_model.predict(X)
-            
+            explain = '0 is for sadness, 1 is for joy, 2 is for love, 3 is for anger, 4 is for fear, 5 is for surprise'
+
+            label_to_text = {0: 'sadness', 1: 'joy', 2: 'love', 3: 'anger', 4: 'fear', 5: 'surprise'}
 
             # Show prediction results to the user
             with st.chat_message("assistant"):
-                
-                st.markdown(pred)
-                
+                st.markdown(explain)
+                st.markdown(f"Prediction: {pred[0]}")
+                st.markdown(f'The emotion you are feeling is: {label_to_text[pred[0]]}')
 
             # Ask for correct label from the user (using st.text_input)
             correct_label = st.text_input("Enter the correct label (e.g., joy, sadness, etc.):")
 
             if correct_label:
-                # Update the model with the new data (partial_fit)
-                X_new = svm_vectorizer.transform([user_input])
-                svm_loaded_model.partial_fit(X_new, [correct_label])  # No `classes` needed now
-    
-            
-    
-                st.session_state.larger_messages.append({"role": "assistant", "content": f"Model updated with label: {correct_label}"})
-                st.write("Model updated with new data!")
+                # Convert correct label to numerical value
+                correct_label_num = label_to_num.get(correct_label.lower())
+
+                if correct_label_num is not None:
+                    # Update the model with the new data (partial_fit)
+                    X_new = svm_vectorizer.transform([user_input])
+                    svm_loaded_model.partial_fit(X_new, [correct_label_num])  # Use numerical label
+
+                    st.session_state.larger_messages.append({"role": "assistant", "content": f"Model updated with label: {correct_label}"})
+                    st.write("Model updated with new data!")
+                else:
+                    st.write("Invalid label entered. Please use one of the following: joy, sadness, love, anger, fear, surprise.")
