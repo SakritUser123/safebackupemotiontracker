@@ -16,51 +16,7 @@ if "larger_messages" not in st.session_state:
     
     
 
-if selected_tab == 'EmotionAI':
-    with open('LogisticRegModel.pkl', 'rb') as f:
-        loaded_model = pickle.load(f)
-    with open('WorkVector.pkl', 'rb') as file:
-        vectorizer = pickle.load(file)
 
-    st.title("💬 Emotion Analyzer AI")
-
-    # Display previous chat messages for Smaller Emotion
-    for msg in st.session_state.smaller_messages:
-        with st.chat_message(msg["role"]):
-            st.markdown(msg["content"])
-
-    user_input = st.chat_input("Enter your text here...")
-
-    if user_input:
-        with st.chat_message("user"):
-            st.markdown(user_input)
-
-        st.session_state.smaller_messages.append({"role": "user", "content": user_input})
-
-        if user_input.strip():
-            user_input_list = [user_input]
-            predictions = loaded_model.predict_proba(vectorizer.transform([user_input]))[0][1]
-
-            emotion = "The Decimal Given Is How Sure The Model Thinks The statement is positive if the decimal is greater than 0.50 then, it is more likely to be positive!"
-            emotion_response = predictions 
-            emoji = ''
-            res = ''
-            if emotion_response > 0.50:
-                emoji = '😊'
-                res = 'Wow! That is great to hear. You can listen to this song to match your emotion.'
-            if emotion_response < 0.50:
-                emoji = '😔'
-                res = 'Oh no! That’s sad to hear. You can feel better by listening to this song that matches your emotion!'
-            if emotion_response == 0.50:
-                emoji = '🤔'
-
-            with st.chat_message("assistant"):
-                st.markdown(emotion)
-                st.markdown(emotion_response)
-                st.markdown(emoji)
-                st.markdown(res)
-
-            st.session_state.smaller_messages.append({"role": "assistant", "content": f"{emotion_response} {emoji} {res}"})
 if selected_tab == 'Multi Emotion AI':
     import pickle
     import numpy as np
@@ -144,9 +100,9 @@ if selected_tab == 'Multi Emotion AI':
                 multi_loaded_model.fit(x_train, y_train)
     
                 # Save the updated model, vectorizer, and training data
-                with open('MultiLogRegModel.pkl', 'wb') as f:
+                with open('OnlineLogReg.pkl', 'wb') as f:
                     pickle.dump(multi_loaded_model, f)
-                with open('MultiWorkVector.pkl', 'wb') as file:
+                with open('OnlineVector.pkl', 'wb') as file:
                     pickle.dump(multi_vectorizer, file)
                 with open('x_train.pkl', 'wb') as f:
                     pickle.dump(x_train, f)
