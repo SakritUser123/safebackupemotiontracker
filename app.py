@@ -67,15 +67,11 @@ if selected_tab == 'Multi Emotion AI':
 
             label_to_text = {0: 'sadness', 1: 'joy', 2: 'love', 3: 'anger', 4: 'fear', 5: 'surprise'}
 
-            # Get the class with the highest probability
-            predicted_class = np.argmax(probabilities)
-            predicted_label = label_to_text[predicted_class]
-
             # Show prediction results to the user
             with st.chat_message("assistant"):
                 st.markdown(explain)
-                st.markdown(f"Prediction: {predicted_label} ({predicted_class})")
-                st.markdown('The emotion you are feeling is: ' + predicted_label)
+                st.markdown(f"Prediction: {pred[0]}")
+                st.markdown('The emotion You are feeling is:' + pred[0])
                 for i in range(len(probabilities)):
                     emotion = label_to_text[i]
                     percent = round(probabilities[i] * 100, 2)
@@ -85,34 +81,27 @@ if selected_tab == 'Multi Emotion AI':
             correct_label = st.text_input("Enter the correct label (e.g., joy, sadness, etc.):")
 
             if correct_label:
-                # Ensure the correct label is mapped to the appropriate integer class
-                label_mapping = {v: k for k, v in label_to_text.items()}
-                if correct_label.lower() in label_mapping:
-                    correct_label_num = label_mapping[correct_label.lower()]
-
-                    # Append the new data to the training set
-                    X_new = multi_vectorizer.transform([user_input])
-                    if x_train is not None:
-                        x_train = vstack([x_train, X_new])  # Keep x_train sparse
-                    else:
-                        x_train = X_new  # First entry
-
-                    y_train = pd.concat([y_train, pd.Series([correct_label_num])], ignore_index=True)
-
-                    # Retrain the model with the updated data
-                    multi_loaded_model.fit(x_train, y_train)
-
-                    # Save the updated model, vectorizer, and training data
-                    with open('OnlineLogReg.pkl', 'wb') as f:
-                        pickle.dump(multi_loaded_model, f)
-                    with open('OnlineVector.pkl', 'wb') as file:
-                        pickle.dump(multi_vectorizer, file)
-                    with open('x_train.pkl', 'wb') as f:
-                        pickle.dump(x_train, f)
-                    with open('y_train.pkl', 'wb') as f:
-                        pickle.dump(y_train, f)
-
-                    st.session_state.larger_messages.append({"role": "assistant", "content": f"Model updated with label: {correct_label}"})
-                    st.write("Model updated with new data!")
+                # Append the new data to the training set
+                X_new = multi_vectorizer.transform([user_input])
+                if x_train is not None:
+                    x_train = vstack([x_train, X_new])  # Keep x_train sparse
                 else:
-                    st.write("Invalid label entered. Please enter one of the following emotions: sadness, joy, love, anger, fear, surprise.")
+                    x_train = X_new  # First entry
+
+                y_train = pd.concat([y_train, pd.Series([correct_label])], ignore_index=True)
+
+                # Retrain the model with the updated data
+                multi_loaded_model.fit(x_train, y_train)
+
+                # Save the updated model, vectorizer, and training data
+                with open('OnlineLogReg.pkl', 'wb') as f:
+                    pickle.dump(multi_loaded_model, f)
+                with open('OnlineVector.pkl', 'wb') as file:
+                    pickle.dump(multi_vectorizer, file)
+                with open('x_train.pkl', 'wb') as f:
+                    pickle.dump(x_train, f)
+                with open('y_train.pkl', 'wb') as f:
+                    pickle.dump(y_train, f)
+
+                st.session_state.larger_messages.append({"role": "assistant", "content": f"Model updated with label: {correct_label}"})
+                st.write("Model updated with new data!")
