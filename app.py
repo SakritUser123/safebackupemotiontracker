@@ -1,61 +1,83 @@
 import streamlit as st
 import pickle
-import os
+import numpy as np
+import pandas as pd
+from scipy.sparse import vstack
 
-# Define model paths
-model_path = "SVMLogReg (3).pkl"
-vectorizer_path = "SVMVector (3).pkl"
+# Initialize session states for chat histories
+if "smaller_messages" not in st.session_state:
+    st.session_state.smaller_messages = []
 
-# Define emotion label mappings
+if "larger_messages" not in st.session_state:
+    st.session_state.larger_messages = []
+
+# Emotion label to numerical conversion
 label_to_num = {'sadness': 0, 'joy': 1, 'love': 2, 'anger': 3, 'fear': 4, 'surprise': 5}
-num_to_label = {v: k for k, v in label_to_num.items()}
-all_labels = list(label_to_num.values())
 
-# Load model and vectorizer (only once at the start of the session)
-if not os.path.exists(model_path) or not os.path.exists(vectorizer_path):
-    st.error("Model or vectorizer file not found!")
-    st.stop()
+# All possible labels (for partial_fit)
+all_labels = [0, 1, 2, 3, 4, 5]  # These correspond to sadness, joy, love, anger, fear, surprise
 
-with open(model_path, "rb") as f:
-    model = pickle.load(f)
+# Load model and vectorizer (SVM model)
+with open('SVMLogReg (3).pkl', 'rb') as f:
+    svm_loaded_model = pickle.load(f)
 
-with open(vectorizer_path, "rb") as f:
-    vectorizer = pickle.load(f)
+with open('SVMVector (3).pkl', 'rb') as file:
+    svm_vectorizer = pickle.load(file)
 
-# Streamlit interface
+# Display UI components
 st.title("💬 Multi Emotion Analyzer AI")
-st.markdown("Supports emotions: `sad`, `joy`, `love`, `anger`, `fear`, `surprise`")
+st.link_button("💻 Pay $3 on Venmo 🤖😊", "https://venmo.com/SakritUser123?txn=pay&amount=3")
+st.write("You can donate to this website; it will help out a lot!")
+st.markdown("""
+---
+Contact: [veerendrasakthi.prabhurajan@gmail.com]  
+GitHub: [The repository for this website!](https://github.com/SakritUser123/emotiontrackerai)
+""")
 
-# Chat input box
-user_input = st.text_input("Enter your sentence:")
+# Display previous chat messages for Larger Emotion
+for msg in st.session_state.get('larger_messages', []):
+    with st.chat_message(msg["role"]):
+        st.markdown(msg["content"])
+
+user_input = st.chat_input("Enter your text here...")
 
 if user_input:
-    # Transform input text to vector using the vectorizer
-    X = vectorizer.transform([user_input])
+    with st.chat_message("user"):
+        st.markdown(user_input)
 
-    # Make prediction using the loaded model
-    pred = model.predict(X)[0]
-    
-    
-    st.write(pred)
+    st.session_state.larger_messages.append({"role": "user", "content": user_input})
 
-    # Ask for user input to update the model (optional)
-    correct_label = st.text_input("Enter correct label to improve the model (optional):")
+    if user_input.strip():
+        # Transform user input
+        user_input_list = [user_input]
+        X = svm_vectorizer.transform(user_input_list)
 
-    if correct_label:
-        correct_label = correct_label.lower().strip()
-        
-        # Ensure the user input is a valid label
-        if correct_label in label_to_num:
-            correct_num = label_to_num[correct_label]
+        # Predict with the existing model
+        pred = svm_loaded_model.predict(X)
+        explain = '0 is for sadness, 1 is for joy, 2 is for love, 3 is for anger, 4 is for fear, 5 is for surprise'
 
-            # Update the model with the new data using partial_fit
-            model.partial_fit(X, [correct_num], classes=all_labels)
+        label_to_text = {0: 'sadness', 1: 'joy', 2: 'love', 3: 'anger', 4: 'fear', 5: 'surprise'}
 
-            # Save the updated model back to the file
-            with open(model_path, "wb") as f:
-                pickle.dump(model, f)
+        # Show prediction results to the user
+        with st.chat_message("assistant"):
+            st.markdown(explain)
+            st.markdown("Prediction: ")
+            st.markdown('The emotion you are feeling is: ')
+            st.markdown(pred)
 
-            st.success(f"✅ Model updated with new label: {correct_label}")
-        else:
-            st.error("Invalid label! Please enter one of: sad, joy, love, anger, fear, surprise.")
+        # Ask for correct label from the user (using st.text_input)
+        correct_label = st.text_input("Enter the correct label (e.g., joy, sadness, etc.):")
+
+        if correct_label:
+            # Convert correct label to numerical value
+            correct_label_num = label_to_num.get(correct_label.lower())
+
+            if correct_label_num is not None:
+                # Update the model with the new data (partial_fit)
+                X_new = svm_vectorizer.transform([user_input])
+                svm_loaded_model.partial_fit(X_new, [correct_label_num], classes=all_labels)  # Use numerical label and classes
+
+                st.session_state.larger_messages.append({"role": "assistant", "content": f"Model updated with label: {correct_label}"})
+                st.write("Model updated with new data!")
+            else:
+                st.write("Invalid label entered. Please use one of the following: joy, sadness, love, anger, fear, surprise.")
