@@ -63,7 +63,7 @@ if user_input:
         with st.chat_message("assistant"):
             st.markdown(explain)
             st.markdown("Prediction: ")
-            st.markdown(f'The emotion you are feeling is: {label_to_text[pred[0]]}')
+            st.markdown(pred)
 
         # Ask for correct label from the user (using st.text_input)
         correct_label = st.text_input("Enter the correct label (e.g., joy, sadness, etc.):")
