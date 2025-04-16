@@ -17,13 +17,18 @@ if "larger_messages" not in st.session_state:
 
 # Emotion label to numerical conversion
 label_to_num = {'sadness': 0, 'joy': 1, 'love': 2, 'anger': 3, 'fear': 4, 'surprise': 5}
+label_to_text = {0: 'sadness', 1: 'joy', 2: 'love', 3: 'anger', 4: 'fear', 5: 'surprise'}
 
 if selected_tab == 'Multi Emotion AI':
     # Load model and vectorizer (SVM model)
-    with open('SVMLogReg (3).pkl', 'rb') as file:
-        svm_loaded_model = pickle.load(file)
-    with open('SVMVector (3).pkl', 'rb') as file:
-        svm_vectorizer = pickle.load(file)
+    try:
+        with open('SVMLogReg.pkl', 'rb') as f:
+            svm_loaded_model = pickle.load(f)
+        with open('SVMVector.pkl', 'rb') as file:
+            svm_vectorizer = pickle.load(file)
+    except Exception as e:
+        st.error(f"Error loading model or vectorizer: {e}")
+        st.stop()
 
     # Display UI components
     st.title("💬 Multi Emotion Analyzer AI")
@@ -54,36 +59,39 @@ if selected_tab == 'Multi Emotion AI':
             X = svm_vectorizer.transform(user_input_list)
 
             # Predict with the existing model
-            pred = svm_loaded_model.predict(X)
-            explain = '0 is for sadness, 1 is for joy, 2 is for love, 3 is for anger, 4 is for fear, 5 is for surprise'
+            pred = svm_loaded_model.predict(X)[0]
 
-            label_to_text = {0: 'sadness', 1: 'joy', 2: 'love', 3: 'anger', 4: 'fear', 5: 'surprise'}
+            explain = '0 = sadness, 1 = joy, 2 = love, 3 = anger, 4 = fear, 5 = surprise'
 
             # Show prediction results to the user
             with st.chat_message("assistant"):
                 st.markdown(explain)
-                st.markdown("Prediction: ")
-                st.markdown(pred)
+                st.markdown(f"The emotion you are feeling is: **{label_to_text.get(pred, 'Unknown')}**")
 
-            # Ask for correct label from the user (using st.text_input)
-            correct_label = st.text_input("Enter the correct label (e.g., joy, sadness, etc.):")
+        # Ask for correct label from the user
+        correct_label = st.text_input("✏️ Enter the correct label (joy, sadness, love, anger, fear, surprise):")
 
-            if correct_label:
-                # Convert correct label to numerical value
-                correct_label_num = label_to_num.get(correct_label.lower())
+        if correct_label:
+            correct_label_num = label_to_num.get(correct_label.lower())
 
-                if correct_label_num is not None:
-                    # Update the model with the new data (partial_fit)
-                    X_new = svm_vectorizer.transform([user_input])
-                    svm_loaded_model.partial_fit(X_new, [correct_label_num])  # Use numerical label
+            if correct_label_num is not None:
+                # Update the model
+                X_new = svm_vectorizer.transform([user_input])
+                try:
+                    svm_loaded_model.partial_fit(X_new, [correct_label_num])
 
-                    # Save the updated model and vectorizer
-                    with open('SVMLogRegNew.pkl', 'wb') as f:
+                    # Save model and vectorizer after update
+                    with open("SVMLogReg.pkl", "wb") as f:
                         pickle.dump(svm_loaded_model, f)
-                    with open('SVMVectorNew.pkl', 'wb') as f:
+                    with open("SVMVector.pkl", "wb") as f:
                         pickle.dump(svm_vectorizer, f)
 
-                    st.session_state.larger_messages.append({"role": "assistant", "content": f"Model updated with label: {correct_label}"})
-                    st.write("Model updated with new data!")
-                else:
-                    st.write("Invalid label entered. Please use one of the following: joy, sadness, love, anger, fear, surprise.")
+                    st.success(f"✅ Model updated and saved with label: {correct_label}")
+                    st.session_state.larger_messages.append({
+                        "role": "assistant",
+                        "content": f"Model updated with label: {correct_label}"
+                    })
+                except Exception as e:
+                    st.error(f"Error updating model: {e}")
+            else:
+                st.warning("Invalid label. Please use one of: joy, sadness, love, anger, fear, surprise.")
