@@ -65,16 +65,16 @@ if selected_tab == 'Multi Emotion AI':
             # Ask for correct label from the user (using st.text_input)
             correct_label = st.text_input("Enter the correct label (e.g., joy, sadness, etc.):")
 
-            if correct_label:
+            
                 # Update the model with the new data (partial_fit)
-                X_new = svm_vectorizer.transform([user_input])
-                svm_loaded_model.partial_fit(X_new, [correct_label])  # No `classes` needed now
+            X_new = svm_vectorizer.transform([user_input])
+            svm_loaded_model.partial_fit(X_new, [correct_label])  # No `classes` needed now
 
                 # Save the updated model and vectorizer
-                with open('SVMLogReg.pkl', 'wb') as f:
-                    pickle.dump(svm_loaded_model, f)
-                with open('SVMVector.pkl', 'wb') as f:
-                    pickle.dump(svm_vectorizer, f)
+            with open('SVMLogReg.pkl', 'wb') as f:
+                pickle.dump(svm_loaded_model, f)
+            with open('SVMVector.pkl', 'wb') as f:
+                pickle.dump(svm_vectorizer, f)
 
-                st.session_state.larger_messages.append({"role": "assistant", "content": f"Model updated with label: {correct_label}"})
-                st.write("Model updated with new data!")
+            st.session_state.larger_messages.append({"role": "assistant", "content": f"Model updated with label: {correct_label}"})
+            st.write("Model updated with new data!")
