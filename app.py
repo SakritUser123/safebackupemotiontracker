@@ -3,27 +3,27 @@ import streamlit as st
 from sklearn.linear_model import SGDClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-# Initialize the model and vectorizer
+# Initialize model and vectorizer from pickle
 
-with open('SVMLogReg (3).pkl', 'rb') as f:
+with open('SVMLogReg.pkl (3)', 'rb') as f:
     model = pickle.load(f)
 with open('SVMVector (3).pkl', 'rb') as f:
     vectorizer = pickle.load(f)
 first_time = False
 
-
 # Streamlit UI components
 st.title("Emotion Prediction and Model Update")
 
-# Loop that will keep asking for user input
-while True:
-    # User input for the sentence
-    user_input = st.text_input("Enter a sentence to predict emotion (or 'stop' to quit):")
+# This session state will be used to keep track of user inputs
+if 'user_input' not in st.session_state:
+    st.session_state.user_input = ""
 
-    if user_input.lower() == 'stop':
-        st.write("Exiting the loop.")
-        break
+# Input for text (enter sentence to predict)
+user_input = st.text_input("Enter a sentence to predict emotion (or 'stop' to quit):", value=st.session_state.user_input)
 
+if user_input.lower() == 'stop':
+    st.write("Exiting the loop.")
+else:
     if user_input:
         # Transform the input using the vectorizer
         X_new = vectorizer.transform([user_input])
@@ -49,3 +49,6 @@ while True:
             pickle.dump(vectorizer, f)
 
         st.write("Model updated!")
+
+    # Save the current user input in the session state to persist across reruns
+    st.session_state.user_input = user_input
