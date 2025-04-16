@@ -47,20 +47,20 @@ if st.button("Submit"):
             label = st.selectbox("Enter label (joy, sad, fear, surprise, anger, love):", 
                                  ['joy', 'sad', 'fear', 'surprise', 'anger', 'love'])
 
-            if st.button("Update Model"):
-                # Update model with the label entered by the user
-                correct_num = label  # Store the user-provided label
-                X_new = vectorizer.transform([user_input])  # Don't refit vectorizer, just transform
+            
+            # Update model with the label entered by the user
+            correct_num = label  # Store the user-provided label
+            X_new = vectorizer.transform([user_input])  # Don't refit vectorizer, just transform
 
-                model.partial_fit(X_new, [correct_num])  # Update the model with new data
+            model.partial_fit(X_new, [correct_num])  # Update the model with new data
 
-                # Save the updated model and vectorizer
-                with open('SVMLogReg (3).pkl', 'wb') as f:
-                    pickle.dump(model, f)
-                with open('SVMVector (3).pkl', 'wb') as f:
-                    pickle.dump(vectorizer, f)
+            # Save the updated model and vectorizer
+            with open('SVMLogReg (3).pkl', 'wb') as f:
+                pickle.dump(model, f)
+            with open('SVMVector (3).pkl', 'wb') as f:
+                pickle.dump(vectorizer, f)
 
-                st.write("Model updated!")
+            st.write("Model updated!")
 
         # Save the current user input in the session state to persist across reruns
         st.session_state.user_input = user_input
