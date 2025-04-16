@@ -20,9 +20,9 @@ label_to_num = {'sadness': 0, 'joy': 1, 'love': 2, 'anger': 3, 'fear': 4, 'surpr
 
 if selected_tab == 'Multi Emotion AI':
     # Load model and vectorizer (SVM model)
-    with open('SVMLogReg(3).pkl', 'rb') as file:
+    with open('SVMLogReg.pkl', 'rb') as file:
         svm_loaded_model = pickle.load(file)
-    with open('SVMVector(3).pkl', 'rb') as file:
+    with open('SVMVector.pkl', 'rb') as file:
         svm_vectorizer = pickle.load(file)
 
     # Display UI components
