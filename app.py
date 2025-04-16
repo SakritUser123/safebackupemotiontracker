@@ -55,9 +55,9 @@ if st.button("Submit"):
             model.partial_fit(X_new, [correct_num])  # Update the model with new data
 
             # Save the updated model and vectorizer
-            with open('SVMLogReg (3).pkl', 'wb') as f:
+            with open('SVMNew.pkl', 'wb') as f:
                 pickle.dump(model, f)
-            with open('SVMVector (3).pkl', 'wb') as f:
+            with open('SVMVectorNew.pkl', 'wb') as f:
                 pickle.dump(vectorizer, f)
 
             st.write("Model updated!")
