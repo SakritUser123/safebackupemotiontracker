@@ -15,32 +15,37 @@ first_time = False
 # Streamlit UI components
 st.title("Emotion Prediction and Model Update")
 
-# User input for the sentence
-user_input = st.text_input("Enter a sentence to predict emotion:")
+# Loop that will keep asking for user input
+while True:
+    # User input for the sentence
+    user_input = st.text_input("Enter a sentence to predict emotion (or 'stop' to quit):")
 
-if user_input:
-    # Transform the input using the vectorizer
-    X_new = vectorizer.transform([user_input])
-    
-    # Predict the emotion
-    ans = model.predict(X_new)
-    st.write(f"Predicted Emotion: {ans[0]}")
+    if user_input.lower() == 'stop':
+        st.write("Exiting the loop.")
+        break
 
-    # Label input from the user
-    label = st.selectbox("Enter label (joy, sad, fear, surprise, anger, love):", 
-                         ['joy', 'sad', 'fear', 'surprise', 'anger', 'love'])
+    if user_input:
+        # Transform the input using the vectorizer
+        X_new = vectorizer.transform([user_input])
 
-    # Update model with the label entered by the user
-    correct_num = label  # Store the user-provided label
-    X_new = vectorizer.transform([user_input])  # Don't refit vectorizer, just transform
+        # Predict the emotion
+        ans = model.predict(X_new)
+        st.write(f"Predicted Emotion: {ans[0]}")
 
-    model.partial_fit(X_new, [correct_num])  # Update the model with new data
+        # Label input from the user
+        label = st.selectbox("Enter label (joy, sad, fear, surprise, anger, love):", 
+                             ['joy', 'sad', 'fear', 'surprise', 'anger', 'love'])
 
-    # Save the updated model and vectorizer
-    with open('SVMLogReg (3).pkl ', 'wb') as f:
-        pickle.dump(model, f)
-    with open('SVMVector (3).pkl', 'wb') as f:
-        pickle.dump(vectorizer, f)
+        # Update model with the label entered by the user
+        correct_num = label  # Store the user-provided label
+        X_new = vectorizer.transform([user_input])  # Don't refit vectorizer, just transform
 
-    st.write("Model updated!")
+        model.partial_fit(X_new, [correct_num])  # Update the model with new data
 
+        # Save the updated model and vectorizer
+        with open('SVMLogReg (3).pkl', 'wb') as f:
+            pickle.dump(model, f)
+        with open('SVMVector (3).pkl', 'wb') as f:
+            pickle.dump(vectorizer, f)
+
+        st.write("Model updated!")
