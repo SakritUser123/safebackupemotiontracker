@@ -28,9 +28,9 @@ if user_input:
     # Predict emotion
     X = vectorizer.transform([user_input])
     pred = model.predict(X)[0]
-    predicted_emotion = num_to_label[pred]
+    
 
-    st.write(f"Predicted emotion: **{predicted_emotion}**")
+    st.write(pred)
 
     # Ask user for the correct label
     correct_label = st.text_input("Enter the correct label to update the model (or leave empty to skip):")
