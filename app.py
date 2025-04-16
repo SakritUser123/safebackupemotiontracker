@@ -56,7 +56,7 @@ if selected_tab == 'Multi Emotion AI':
 
             # Show prediction results to the user
             with st.chat_message("assistant"):
-                st.markdown(explain)
+                
                 st.markdown(pred)
                 
 
