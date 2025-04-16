@@ -66,7 +66,7 @@ if selected_tab == 'Multi Emotion AI':
             # Show prediction results to the user
             with st.chat_message("assistant"):
                 st.markdown(explain)
-                st.markdown(f"The emotion you are feeling is: **{label_to_text.get(pred, 'Unknown')}**")
+                st.markdown(pred)
 
         # Ask for correct label from the user
         correct_label = st.text_input("✏️ Enter the correct label (joy, sadness, love, anger, fear, surprise):")
