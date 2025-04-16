@@ -3,7 +3,7 @@ import pickle
 import os
 
 # Map text labels to numbers and back
-label_to_num = {'sadness': 0, 'joy': 1, 'love': 2, 'anger': 3, 'fear': 4, 'surprise': 5}
+label_to_num = {'sad': 0, 'joy': 1, 'love': 2, 'anger': 3, 'fear': 4, 'surprise': 5}
 num_to_label = {v: k for k, v in label_to_num.items()}
 
 # Load model/vectorizer ONCE and store in session_state
