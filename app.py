@@ -40,9 +40,11 @@ if st.button("📈 Update Model"):
 
     # Check if it's the first call to partial_fit
     if not hasattr(model, 'classes_'):
-        model.partial_fit(X_new, [label], classes=classes)
+        for i in range(5):
+            model.partial_fit(X_new, [label], classes=classes)
     else:
-        model.partial_fit(X_new, [label])
+        for i in range(5):
+            model.partial_fit(X_new, [label])
 
     # Save the updated model
     with open('SVMNew.pkl', 'wb') as f:
