@@ -4,17 +4,13 @@ from sklearn.linear_model import SGDClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 # Initialize model and vectorizer from pickle
-try:
-    with open('SVMNew.pkl', 'rb') as f:
-        model = pickle.load(f)
-    with open('SVMVectorNew.pkl', 'rb') as f:
-        vectorizer = pickle.load(f)
-    first_time = False
-except:
-    # Initialize if not found
-    model = SGDClassifier(loss='log')
-    vectorizer = TfidfVectorizer()
-    first_time = True
+
+with open('SVMNew.pkl', 'rb') as f:
+    model = pickle.load(f)
+with open('SVMVectorNew.pkl', 'rb') as f:
+    vectorizer = pickle.load(f)
+first_time = False
+
 
 # Streamlit UI components
 st.title("Emotion Prediction and Model Update")
