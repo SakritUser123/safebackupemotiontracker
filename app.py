@@ -4,7 +4,7 @@ from sklearn.linear_model import SGDClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 # Load trained model and vectorizer
-with open('SVMNewpkl', 'rb') as f:
+with open('SVMNew.pkl', 'rb') as f:  # Make sure this matches the saved filename
     model = pickle.load(f)
 with open('SVMVectorNew.pkl', 'rb') as f:
     vectorizer = pickle.load(f)
@@ -38,13 +38,17 @@ label = st.selectbox("✅ Confirm or correct the emotion label:", classes)
 if st.button("📈 Update Model"):
     X_new = vectorizer.transform([user_input])
 
-    # Check if it's the first call to partial_fit
+    # Prediction before update
+    before = model.predict(X_new)[0]
+
+    # First-time setup for partial_fit
     if not hasattr(model, 'classes_'):
-        for i in range(20):
-            model.partial_fit(X_new, [label], classes=classes)
+        model.partial_fit(X_new, [label], classes=classes)
     else:
-        for i in range(20):
-            model.partial_fit(X_new, [label])
+        model.partial_fit(X_new, [label])
+
+    # Prediction after update
+    after = model.predict(X_new)[0]
 
     # Save the updated model
     with open('SVMNew.pkl', 'wb') as f:
@@ -52,7 +56,9 @@ if st.button("📈 Update Model"):
     with open('SVMVectorNew.pkl', 'wb') as f:
         pickle.dump(vectorizer, f)
 
-    st.success("✅ Model updated successfully!")
+    # Show change
+    st.info(f"🔄 Model Prediction Updated\n**Before:** {before}\n**After:** {after}")
+    st.session_state.predicted_emotion = ""  # Clear old prediction
 
 # Save user input in session state
 st.session_state.user_input = user_input
