@@ -3,65 +3,57 @@ import streamlit as st
 from sklearn.linear_model import SGDClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-# Initialize model and vectorizer from pickle
-
+# Load model and vectorizer
 with open('SVMNewpkl', 'rb') as f:
     model = pickle.load(f)
 with open('SVMVectorNew.pkl', 'rb') as f:
     vectorizer = pickle.load(f)
+
 first_time = False
 
-
-# Streamlit UI components
-st.title("Emotion Prediction and Model Update")
-
-# This session state will be used to keep track of user inputs
+# Initialize session state
 if 'user_input' not in st.session_state:
     st.session_state.user_input = ""
 if 'predicted_emotion' not in st.session_state:
     st.session_state.predicted_emotion = ""
 
-# Input for text (enter sentence to predict)
-user_input = st.text_input("Enter a sentence to predict emotion (or 'stop' to quit):", value=st.session_state.user_input)
+# App title
+st.markdown("<h1 style='text-align: center; color: #4B8BBE;'>💬 Emotion Predictor & Trainer</h1>", unsafe_allow_html=True)
+st.markdown("### 👇 Enter a sentence and label the emotion if the prediction is wrong.")
 
-# Submit button to predict emotion
-if st.button("Submit"):
-    if user_input.lower() == 'stop':
-        st.write("Exiting the loop.")
-    else:
-        if user_input:
-            # Transform the input using the vectorizer
+# Form UI to avoid multiple button clicks triggering everything
+with st.form(key="predict_form"):
+    user_input = st.text_input("🔤 Enter a sentence:", value=st.session_state.user_input, key="text_input")
+
+    submit = st.form_submit_button("🎯 Predict")
+
+    if submit:
+        if user_input.lower() == 'stop':
+            st.info("🚪 Exiting the app. Refresh to restart.")
+        elif user_input.strip() == "":
+            st.warning("Please enter a sentence.")
+        else:
             X_new = vectorizer.transform([user_input])
-
-            # Predict the emotion
             predicted = model.predict(X_new)
             st.session_state.predicted_emotion = predicted[0]
+            st.session_state.user_input = user_input  # save user input
 
-            st.write(f"Predicted Emotion: {st.session_state.predicted_emotion}")
-
-            # Label input from the user to update the model
-            label = st.selectbox("Enter label (joy, sad, fear, surprise, anger, love):", 
-                                 ['joy', 'sad', 'fear', 'surprise', 'anger', 'love'])
-
-            
-            # Update model with the label entered by the user
-            correct_num = label  # Store the user-provided label
-            X_new = vectorizer.transform([user_input])  # Don't refit vectorizer, just transform
-
-            model.partial_fit(X_new, [correct_num])  # Update the model with new data
-
-            # Save the updated model and vectorizer
-            with open('SVMNew.pkl', 'wb') as f:
-                pickle.dump(model, f)
-            with open('SVMVectorNew.pkl', 'wb') as f:
-                pickle.dump(vectorizer, f)
-
-            st.write("Model updated!")
-
-        # Save the current user input in the session state to persist across reruns
-        st.session_state.user_input = user_input
-
-# Display current predicted emotion
+# Show prediction result if available
 if st.session_state.predicted_emotion:
-    st.write(f"Predicted Emotion: **{st.session_state.predicted_emotion}**")
+    st.success(f"🎉 Predicted Emotion: **{st.session_state.predicted_emotion}**")
 
+    st.markdown("#### 🛠️ Was that correct? If not, help train the model:")
+
+    label = st.selectbox("✅ Choose correct label:", 
+                         ['joy', 'sad', 'fear', 'surprise', 'anger', 'love'], key="label_select")
+
+    if st.button("📈 Update Model with New Label"):
+        X_new = vectorizer.transform([st.session_state.user_input])
+        model.partial_fit(X_new, [label])
+
+        with open('SVMNew.pkl', 'wb') as f:
+            pickle.dump(model, f)
+        with open('SVMVectorNew.pkl', 'wb') as f:
+            pickle.dump(vectorizer, f)
+
+        st.success("✅ Model successfully updated!")
