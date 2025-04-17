@@ -5,7 +5,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 # Initialize model and vectorizer from pickle
 
-with open('SVMNew.pkl', 'rb') as f:
+with open('SVMNewpkl', 'rb') as f:
     model = pickle.load(f)
 with open('SVMVectorNew.pkl', 'rb') as f:
     vectorizer = pickle.load(f)
