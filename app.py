@@ -9,51 +9,52 @@ with open('SVMNewpkl', 'rb') as f:
 with open('SVMVectorNew.pkl', 'rb') as f:
     vectorizer = pickle.load(f)
 
-first_time = False
+# Define emotion labels
+classes = ['joy', 'sad', 'fear', 'surprise', 'anger', 'love']
 
-# Initialize session state
+# Track state
 if 'user_input' not in st.session_state:
     st.session_state.user_input = ""
 if 'predicted_emotion' not in st.session_state:
     st.session_state.predicted_emotion = ""
+if 'first_time' not in st.session_state:
+    st.session_state.first_time = True  # Important!
 
-# App title
-st.markdown("<h1 style='text-align: center; color: #4B8BBE;'>💬 Emotion Predictor & Trainer</h1>", unsafe_allow_html=True)
-st.markdown("### 👇 Enter a sentence and label the emotion if the prediction is wrong.")
+st.title("💬 Emotion Predictor & Online Trainer")
 
-# Form UI to avoid multiple button clicks triggering everything
 with st.form(key="predict_form"):
-    user_input = st.text_input("🔤 Enter a sentence:", value=st.session_state.user_input, key="text_input")
-
+    user_input = st.text_input("🔤 Enter a sentence:", value=st.session_state.user_input)
     submit = st.form_submit_button("🎯 Predict")
 
     if submit:
         if user_input.lower() == 'stop':
-            st.info("🚪 Exiting the app. Refresh to restart.")
+            st.info("Exiting.")
         elif user_input.strip() == "":
-            st.warning("Please enter a sentence.")
+            st.warning("Please enter some text.")
         else:
             X_new = vectorizer.transform([user_input])
             predicted = model.predict(X_new)
             st.session_state.predicted_emotion = predicted[0]
-            st.session_state.user_input = user_input  # save user input
+            st.session_state.user_input = user_input
 
-# Show prediction result if available
 if st.session_state.predicted_emotion:
     st.success(f"🎉 Predicted Emotion: **{st.session_state.predicted_emotion}**")
 
-    st.markdown("#### 🛠️ Was that correct? If not, help train the model:")
+    label = st.selectbox("✅ Correct label (to update model):", classes)
 
-    label = st.selectbox("✅ Choose correct label:", 
-                         ['joy', 'sad', 'fear', 'surprise', 'anger', 'love'], key="label_select")
-
-    if st.button("📈 Update Model with New Label"):
+    if st.button("📈 Update Model"):
         X_new = vectorizer.transform([st.session_state.user_input])
-        model.partial_fit(X_new, [label])
+
+        if st.session_state.first_time:
+            model.partial_fit(X_new, [label], classes=classes)  # important on first update
+            st.session_state.first_time = False
+        else:
+            model.partial_fit(X_new, [label])
 
         with open('SVMNew.pkl', 'wb') as f:
             pickle.dump(model, f)
         with open('SVMVectorNew.pkl', 'wb') as f:
             pickle.dump(vectorizer, f)
 
-        st.success("✅ Model successfully updated!")
+        st.success("✅ Model updated and learning!")
+
