@@ -10,7 +10,7 @@ with open('SVMVectorNew.pkl', 'rb') as f:
     vectorizer = pickle.load(f)
 
 # Class labels for training
-classes = ['joy', 'sad', 'fear', 'suprise', 'anger', 'love']
+classes = ['joy', 'sad', 'fear', 'surprise', 'anger', 'love']
 
 # Session state for persistent UI elements
 if 'user_input' not in st.session_state:
