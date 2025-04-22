@@ -4,7 +4,7 @@ from sklearn.linear_model import SGDClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 # Load trained model and vectorizer
-with open('SVMNew.pkl', 'rb') as f:  # Make sure this matches the saved filename
+with open('SVMNewpkl', 'rb') as f:  # Make sure this matches the saved filename
     model = pickle.load(f)
 with open('SVMVectorNew.pkl', 'rb') as f:
     vectorizer = pickle.load(f)
