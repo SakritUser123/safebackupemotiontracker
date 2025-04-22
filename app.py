@@ -29,7 +29,7 @@ if st.button("🔍 Predict Emotion"):
         X_new = vectorizer.transform([user_input])
         predicted = model.predict(X_new)
         st.session_state.predicted_emotion = predicted[0]
-        st.success(f"Predicted Emotion: **{predicted[0]}**")
+        st.success(f"Predicted Emotion: **{after}**")
 
 # Dropdown to update label
 label = st.selectbox("✅ Confirm or correct the emotion label:", classes)
@@ -59,7 +59,7 @@ if st.button("📈 Update Model"):
     # Show change
     st.info(f"🔄 Model Prediction Updated\n**Before:** {before}\n**After:** {after}")
     st.session_state.predicted_emotion = ""  # Clear old prediction
-    st.session_state.predicted_emotion = after 
+    
 # Save user input in session state
 st.session_state.user_input = user_input
 
