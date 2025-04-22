@@ -26,6 +26,7 @@ user_input = st.text_input("✏️ Enter a sentence:", value=st.session_state.us
 # Submit button to make prediction
 if st.button("🔍 Predict Emotion"):
     if user_input.strip():
+        after = model.predict(X_new)[0]
         X_new = vectorizer.transform([user_input])
         predicted = model.predict(X_new)
         st.session_state.predicted_emotion = predicted[0]
