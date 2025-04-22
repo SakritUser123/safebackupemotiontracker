@@ -22,7 +22,7 @@ st.title("💬 Emotion Prediction & Online Model Update")
 
 # Text input
 user_input = st.text_input("✏️ Enter a sentence:", value=st.session_state.user_input)
-
+X_new = vectorizer.transform([user_input])
 # Submit button to make prediction
 if st.button("🔍 Predict Emotion"):
     if user_input.strip():
