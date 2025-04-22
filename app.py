@@ -59,7 +59,7 @@ if st.button("📈 Update Model"):
     # Show change
     st.info(f"🔄 Model Prediction Updated\n**Before:** {before}\n**After:** {after}")
     st.session_state.predicted_emotion = ""  # Clear old prediction
-
+    predicted[0] = after
 # Save user input in session state
 st.session_state.user_input = user_input
 
